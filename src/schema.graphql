@@ -1,0 +1,123 @@
+type Query {
+  hello: String!
+  users: [User]!
+}
+
+type Mutation {
+  createUser(data: CreateUserInput!): CreateUserResult
+  updateUser(id: ID!, data: UpdateUserInput!): UpdateUserResult
+  deleteUser(id: ID!): DeleteUserResult
+  createPost(data: CreatePostInput!): CreatePostResult
+  updatePost(id: ID!, data: UpdatePostInput!): UpdatePostResult
+  deletePost(id: ID!): DeletePostResult
+}
+
+interface IUser {
+  id: ID!
+  name: String!
+  age: Int!
+}
+
+type User implements IUser {
+  id: ID!
+  name: String!
+  age: Int!
+  posts: [Post]!
+}
+
+interface IPost {
+  id: ID!
+  content: String!
+}
+
+type Post implements IPost {
+  id: ID!
+  content: String!
+}
+
+
+
+### ErrorCode ###
+enum ErrorCode {
+  USER_NOT_FOUND
+  POST_NOT_FOUND
+}
+
+### Error ###
+interface Error {
+  code: ErrorCode!
+  message: String!
+}
+
+type UserNotFoundError implements Error {
+  code: ErrorCode!
+  message: String!
+  requestUserId: ID!
+}
+
+type PostNotFoundError implements Error {
+  code: ErrorCode!
+  message: String!
+  requestPostId: ID!
+}
+
+type CreateUserSuccess implements IUser {
+  id: ID!
+  name: String!
+  age: Int!
+}
+
+input CreateUserInput {
+  name: String!
+  age: Int!
+}
+
+union CreateUserResult = CreateUserSuccess
+
+input UpdateUserInput {
+  name: String
+  age: Int
+}
+
+type UpdateUserSuccess implements IUser {
+  id: ID!
+  name: String!
+  age: Int!
+}
+
+union UpdateUserResult = UpdateUserSuccess | UserNotFoundError
+
+type DeleteUserSuccess {
+  id: ID!
+}
+
+union DeleteUserResult = DeleteUserSuccess | UserNotFoundError
+
+input CreatePostInput {
+  content: String!
+  userId: ID!
+}
+
+type CreatePostSuccess implements IPost {
+  id: ID!
+  content: String!
+}
+
+union CreatePostResult = CreatePostSuccess | UserNotFoundError
+
+input UpdatePostInput {
+  content: String
+}
+
+type UpdatePostSuccess implements IPost {
+  id: ID!
+  content: String!
+}
+
+union UpdatePostResult = UpdatePostSuccess | PostNotFoundError
+
+type DeletePostSuccess {
+  id: ID!
+}
+
+union DeletePostResult = DeletePostSuccess | PostNotFoundError
